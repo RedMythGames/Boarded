@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f848101ed86e2de41a099ff0a21cb83e
+timeCreated: 1490238836
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - FriendlyGrid: {instanceID: 0}
+  - EnemyGrid: {instanceID: 0}
+  - bullet: {instanceID: 0}
+  - healthBar: {instanceID: 0}
+  - healthText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
