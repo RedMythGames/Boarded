@@ -17,6 +17,7 @@ public class Player : CharacterBase {
     [SerializeField]
     private float speed;
 
+    //Player's position will be pos, used for modification before application
     private Vector3 pos;
 
     //How big each tile is
@@ -38,6 +39,7 @@ public class Player : CharacterBase {
     [HideInInspector]
     public static Player instance;
 
+    //When the scene first starts, the static instance Player is assigned to this (there will only be one Player script)
     void Start() { instance = this; }
 
     //When the player is enabled, assigns the tiles in Grid to be stored in PlayerTiles, thensets the player to be on the rop left corner
@@ -49,18 +51,20 @@ public class Player : CharacterBase {
 
         debugText2.text = "Y height" + Screen.height;
 
-        //Sets the pos variable to the player's position so it can be used easier later
+        //Sets the pos variable to the player's position so it can be modified before applying to the Game Object
         pos = transform.position;
 
         //This variable is incremented to track which tile (in the FriendlyGrid gameobject) is assigned to PlayerTiles
         int childCounter = 0;
         //Assigns the PlayerTiles 2D array to be the tile grid in order
+	//(Note: Look for more efficient way to accomplish this)
         for(int y = 0; y < PlayerTiles.GetLength(1); y++) {
             for (int x = 0; x < PlayerTiles.GetLength(0); x++) {
                 PlayerTiles[x, y] = FriendlyGrid.transform.GetChild(childCounter).gameObject;
                 childCounter++;
             }
         }
+	    
         //Resets the child counter (to be used again) then assigns the EnemyGrid in the same way that FriendlyGrid was assigned
         childCounter = 0;
         for (int y = 0; y < EnemyTiles.GetLength(1); y++) {
@@ -69,14 +73,18 @@ public class Player : CharacterBase {
                 childCounter++;
             }
         }
+	    
+	//Sets the Game Object's position to be the top left of the graph at the start    
         transform.position = PlayerTiles[0, 0].transform.position + offset;
     }
 
     //The two variables that will track the x and y position of the tile that the player is on
-    //(ex: If the player is in the top left corner, xTIle and yTile will both be 0, but if the player moves to the left, xTile will be 1 and yTile will still be 0)
+    //(ex: If the player is in the top left corner,
+	//xTIle and yTile will both be 0, but if the player moves to the left, xTile will be 1 and yTile will still be 0)
     [SerializeField]
     int xTile = 0, yTile = 0;
-
+	
+	//Public accessor methods for xTile and yTile
     public int getX() { return xTile; }
     public int getY() { return yTile; }
 
@@ -88,23 +96,27 @@ public class Player : CharacterBase {
     [SerializeField]
     Image healthBar;
 
-
+	//The text that will display the current health of the player
     [SerializeField]
     Text healthText;
 
+	//Used for debugging purposes
     [SerializeField]
     Text debugText, debugText2;
 
+	//Every frame change, this function will handle movement and attacks
     void Update() {
 
-        //Increases the moveTime variable with time
+        //Increases the moveTime variable with time (moveTime is used to keep the player from moving too fast
         moveTime += Time.deltaTime;
 
-        //Moves the character in the direction inputted
-        if (Input.GetButtonDown("Right") /*&& moveTime > speed*/) {
+        //Moves the character in the direction inputted on the keyboard
+		//(Note: The player can move right and left every frame, but not vertical.
+		//			This is simply a design choice and can be manipulated)
+        if (Input.GetButtonDown("Right")) {
             setPosToTile(1, true);
         }
-        else if (Input.GetButtonDown("Left") /*&& moveTime > speed*/) {
+        else if (Input.GetButtonDown("Left")) {
             setPosToTile(-1, true);
         }
         if (Input.GetButtonDown("Up") && moveTime > speed) {
@@ -113,20 +125,27 @@ public class Player : CharacterBase {
         else if(Input.GetButtonDown("Down") && moveTime > speed) {
             setPosToTile(1, false);
         }
-
-        //Touch id refers to the touch as long as it is on screen
-
-        /*if (Input.GetTouch(0).deltaPosition.x > Vector2.zero.x)
-            debugText.text = "Touch was farther to the right";
-        else if (Input.GetTouch(0).deltaPosition.x < Vector2.zero.x)
-            debugText.text = "Touch was farther to the left";*/
-
+		
+		//This starts the section for touch screen movement. It's messy and it's inefficient but it's the best I could do :D
+		
+		//If the player is not touching the screen, the player can move again.
+		if(Input.touchCount == 0) {
+		 swipe = true;
+		 //oldTouch.position = Vector2.zero;
+		 }
+		
+		//If the player has touched the screen
 		if (Input.touchCount == 1) {
+			//If the player's finger has moved in any direction, and they haven't moved with that touch
+			//(Essentially, if the player's finger has swiped the screen, and they haven't moved without taking off their finger)
 			if (Input.touches [0].phase == TouchPhase.Moved && swipe) {
+				//The current touch of the player, currTouch isn't necessary but makes the code easier to see
 				var currTouch = Input.touches [0];
-
+				
+				//If the current touch is farther to the right (compared to the last touch) by at least touchOffset.x pixels, moves the Player to the right
 				if (currTouch.position.x > oldTouch.position.x + touchOffset.x) {
 					setPosToTile (1, true);
+				//Otherwise, if the current touch is farther to the left, moves the Player to the left
 				} else if (currTouch.position.x < oldTouch.position.x - touchOffset.x) {
 					setPosToTile (-1, true);
 				}
@@ -155,9 +174,6 @@ public class Player : CharacterBase {
         	
 				oldTouch = currTouch;
 			}
-		} else {
-			swipe = true;
-			//oldTouch.position = Vector2.zero;
 		}
 
         //Debug.Log("XTile: " + xTile + "YTile: " + yTile);
