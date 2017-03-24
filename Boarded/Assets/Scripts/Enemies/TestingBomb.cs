@@ -30,6 +30,6 @@ public class TestingBomb : ShootTime {
 
     protected override void extraShoot() {
         base.extraShoot();
-        newBullet.GetComponent<RaycastTester>().setTile(PlayerTiles[Player.instance.getX(), GetComponent<TestingTurret>().getVTC()]);
+
     }
 }

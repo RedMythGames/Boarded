@@ -87,6 +87,8 @@ public class Player : CharacterBase {
     //The health bar whose fill amount will be manipulated, and the health text which will be shown to the user
     [SerializeField]
     Image healthBar;
+
+
     [SerializeField]
     Text healthText;
 
