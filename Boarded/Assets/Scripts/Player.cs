@@ -156,7 +156,7 @@ public class Player : CharacterBase {
 				oldTouch = currTouch;
 			}
 		} else {
-			swipe = false;
+			swipe = true;
 			//oldTouch.position = Vector2.zero;
 		}
 
@@ -239,6 +239,7 @@ public class Player : CharacterBase {
     }
 
     void setPosToTile(int change, bool horizChange) {
+		swipe = false;
         if (horizChange)
             xTile = GridAdd(xTile, change);
         else {
