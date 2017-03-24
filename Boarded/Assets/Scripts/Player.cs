@@ -1,5 +1,5 @@
-﻿/**Date Created: 3/10/17
- *Last Modified: 3/22/17
+/**Date Created: 3/10/17
+ *Last Modified: 3/23/17
  * 
  * The script for the player object. The purpose (as of now) is simply to allow the character to move and shoot.
  * -Rishi Parida
@@ -121,33 +121,44 @@ public class Player : CharacterBase {
         else if (Input.GetTouch(0).deltaPosition.x < Vector2.zero.x)
             debugText.text = "Touch was farther to the left";*/
 
-        if (Input.touchCount == 1) {
-            var touch = Input.touches[0];
-            if (touch.position.x < Screen.width / 2) {
-                if(touch.position.y < Screen.height / 2)
-                    setPosToTile(-1, false);
-                    //debugText.text = "Touch was farther down and to the left";
-                else
-                    setPosToTile(-1, true);
-                //debugText.text = "Y po: " + touch.position.y + " X po: " + touch.position.x;
-            }
-            else if (touch.position.x > Screen.width / 2) {
-                if (touch.position.y < Screen.height / 2)
-                    setPosToTile(1, false);
-                    //debugText.text = "Touch was farther down and to the right";
-                else
-                    setPosToTile(1, true);
-                //debugText.text = "Y po: " + touch.position.y + " X po: " + touch.position.x;
-            }
-            /*else if (touch.position.x < Screen.width / 2 && touch.position.y < Screen.height / 2) {
-                setPosToTile(-1, false);
-            }
-            else if (touch.position.x > Screen.width / 2 && touch.position.y < Screen.height / 2) {
-                setPosToTile(-1, false);
-            }*/
+		if (Input.touchCount == 1) {
+			if (Input.touches [0].phase == TouchPhase.Moved && swipe) {
+				var currTouch = Input.touches [0];
 
-            debugText.text = "Y po: " + touch.position.y + " X po: " + touch.position.x;
-        }
+				if (currTouch.position.x > oldTouch.position.x + touchOffset.x) {
+					setPosToTile (1, true);
+				} else if (currTouch.position.x < oldTouch.position.x - touchOffset.x) {
+					setPosToTile (-1, true);
+				}
+
+				if (currTouch.position.y > oldTouch.position.y + touchOffset.y) {
+					setPosToTile (1, false);
+				} else if (currTouch.position.y < oldTouch.position.y - touchOffset.y) {
+					setPosToTile (1, false);
+				}
+
+				/*if (currTouch.position.x < Screen.width / 2) {
+	                if(currTouch.position.y < Screen.height / 2)
+	                    setPosToTile(-1, false);
+	                else
+	                    setPosToTile(-1, true);
+	            }
+	            else if (currTouch.position.x > Screen.width / 2) {
+	                if (currTouch.position.y < Screen.height / 2)
+	                    setPosToTile(1, false);
+	                else
+	                    setPosToTile(1, true);
+	                //debugText.text = "Y po: " + touch.position.y + " X po: " + touch.position.x;
+	            }
+
+	            debugText.text = "Y po: " + currTouch.position.y + " X po: " + currTouch.position.x;*/
+        	
+				oldTouch = currTouch;
+			}
+		} else {
+			swipe = false;
+			//oldTouch.position = Vector2.zero;
+		}
 
         //Debug.Log("XTile: " + xTile + "YTile: " + yTile);
         transform.position = pos;
@@ -165,6 +176,11 @@ public class Player : CharacterBase {
         }
 
     }
+	Touch oldTouch;
+	bool swipe = true;
+
+	[SerializeField]
+	Vector2 touchOffset;
 
     [SerializeField]
     GameObject PlayerSword;
